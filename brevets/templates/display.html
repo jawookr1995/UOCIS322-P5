@@ -1,0 +1,12 @@
+{% if items|length < 1 %}
+    <h2>Database is empty!!!!!</h2>
+{% else %}
+{% for ddt in dist_date_time %}
+    <h2>Distance: {{ ddt.distance }} date: {{ ddt.begin_date }} time: {{ ddt.begin_time }}</h2>
+{% endfor %}
+{% for item in items %}
+    <h3>Brevet: {{ loop.index }}</h3>
+    <p>miles: {{ item.miles }} km: {{ item.km }} location: {{ item.location }}<p>
+    <p>open: {{ item.open }} close: {{ item.close }}</p>
+{% endfor %}
+{% endif %}
