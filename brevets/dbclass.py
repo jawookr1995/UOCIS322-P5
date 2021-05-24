@@ -9,15 +9,15 @@ class Mongo:
         self.client = None
         self.db = None
 
+    def mk_db(self, dataB):
+        self.db = self.client.tododb
+
     def connect(self):
         self.client = MongoClient('mongodb://' + self.tester, 27017)
         # Default mongoDB Port
 
-    def mk_db(self, dataB):
-        self.db = self.client[dataB]
-
-    def insert_o(self, collection, row):
-        self.db[collection].insert_one(row)
+    def insert_o(self, data_b):
+        self.db[collection].insert_one(data_b)
         # insert_one function
         # credit : https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/
     def delete_all(self, collection):
@@ -25,3 +25,4 @@ class Mongo:
 
     def list_all(self, collection):
         return list(self.db[collection].find())
+        # return all the list that is contained in db collection

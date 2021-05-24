@@ -25,7 +25,7 @@ CONFIG = config.configuration()
 client = dbclass.Mongo(os.environ['MONGODB_HOSTNAME'])
 client.connect()
 client.mk_db("db_for_brev")
-db = client.tododb
+
 
 
 
