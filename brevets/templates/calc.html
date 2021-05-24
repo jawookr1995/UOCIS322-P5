@@ -52,7 +52,7 @@
 {% endwith %}
 
 <!-- Design on bootstrap grid -->
-<form role="form">
+<form role="form" action="/submit" method="POST">
 <div class="row">
   <div class="col-md-4">
     <label>Distance</label>
@@ -64,13 +64,11 @@
     <option value="1000">1000km</option>
   </select>
   </div> <!-- columns 1--4  -->
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label>Begins at</label>
-    <input type="datetime-local" name="begin_date" id="begin_date" value="2021-01-01T00:00" />
+    <input type=date name="begin_date" id="begin_date" value="2021-01-01" />
+    <input type=time name="begin_time" id="begin_time" value="00:00"    />
   </div> <!-- columns 5-10 -->
-  <div class="col-md-4">
-    <button id="submit">Submit</button>
-    <button id="display">Display</button>
   </div> <!-- row -->
 
   <br />  <!-- Cosmetic -- a little vertical space -->
@@ -82,76 +80,131 @@
   <div class="col-md-12"> 
   <table class="control_time_table">
       <tr>
-	<th> Miles </th>
-	<th> Km </th>
-	<th>Location</th>
-	<th>Open</th>
-	<th>Close</th>
-	<th>Notes</th>
+  <th> Miles </th>
+  <th> Km </th>
+  <th>Location</th>
+  <th>Open</th>
+  <th>Close</th>
+  <th>Notes</th>
       </tr>
    {% for row in range(20) %}
     <tr class="control">
       <!-- Dist (mi) -->
-      <td><input name="miles" type="number" step ="0.00001" 
+      <td><input name="miles" type="number" 
            min="0" max="900" step="any" size="5" /></td>
       <!-- Dist (km) -->
-      <td><input name="km" type="text" step = "0.00001"
-	   min="0" max="1100" size="5" /> </td>
+      <td><input name="km" type="text"
+     min="0" max="1100" size="5" /> </td>
       <!-- Location (optional) -->
       <td><input name="location" type="text" 
         placeholder="Optional location name"
-	size="20" /> </td>
+  size="20" /> </td>
       <!-- Open time (read only, set by JavaScript function -->
       <td><input name="open" type="datetime" value="" readonly /></td>
       <!-- Close time (read only, set by JavaScript function -->
       <td><input name="close" type="datetime" value="" readonly /></td>
       <!-- Notes (error messages for this row) -->
-      <td class="notes"> &nbsp; </td>
+      <td class="notes"><p class="n"></p></td>
     </tr>
     {% endfor %}
   </table>
   </div> <!-- col -->
   </div> <!-- row -->
+  <input type="submit"></input>
 </form>
+
+<button id="display">Display</button>
 
 <script type="text/javascript">
 
   var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
   var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
+
+  $("#entry").submit( function(event) {
+  event.preventDefault();
+  });
+
   // Pass calctimes a <td> element containing the data for a control.
   // It extracts the distance and calls the server to get times to
   // fill in open and close times in a human-readable format.
   // (If we want to also keep the ISO-formatted times, we'll need to
   // stash them in hidden fields.) 
   function calc_times(control) {
-              var km = control.find("input[name='km']").val();
-              var brevet_dist = $('#brevet_dist_km').val();
-              var begin_date = $('#begin_date').val();
-              var open_time_field = control.find("input[name='open']");
-              var close_time_field = control.find("input[name='close']");
+    var km = control.find("input[name='km']").val();
+    var open_time_field = control.find("input[name='open']");
+    var close_time_field = control.find("input[name='close']");
+    var sel = document.getElementById('brevet_dist_km');
+    var opt = sel.options[sel.selectedIndex];
+    var maxkm = opt.value;
+    console.log("maxkm: " + maxkm);
+    var dateControl = document.querySelector('input[type="date"]');
+    var timeControl = document.querySelector('input[type="time"]');
+    var date_time = dateControl.value + " " + timeControl.value + ":00";
+    date_time = moment(date_time, moment.ISO_8601).format();
+    console.log("date_time: " + date_time);
+    var target = control.find("p.n")
+    var isValid = 1;
+    var prevsib = control.prev();
+    var prevsibs = control.prevAll();
+    var nextsibs = control.nextAll();
 
-              if (km > (brevet_dist * 1.2)) {
-                 console.log("The control point (" + km + " km) is over 20% longer than the theoretical distance (" + brevet_dist + " km). Give valid control location!");
-                 alert("The control point (" + km + " km) is over 20% longer than the theoretical distance (" + brevet_dist + " km). Give valid control distance!");
-                 control.html("");
-              }
-              else {
-                 $.getJSON(TIME_CALC_URL, {km: km, brevet_dist: brevet_dist, begin_date: begin_date}).done(
-                   function(data) {
-                      var times = data.result;
-                      console.log("Got a response: ");
-                      console.log("Response.open = " + times.open);
-                      // This will fill up the open time and close time with format.
-                      open_time_field.val(moment(times.open).format("YYYY-MM-DDTHH:mm"));
-                      close_time_field.val(moment(times.close).format("YYYY-MM-DDTHH:mm"));
-                    }
-                  ).fail(function(err){
-                    console.log("Error!");
-                    console.log(err);
-                  });
-              }
-            }
-    
+    if (prevsib != null && prevsib.find("input[name='km']").val() === "") {
+      isValid = 2;
+    }
+    if (prevsibs.length != 0) {
+      prevsibs.each(function() {
+        var prevkm = parseFloat($(this).find("input[name='km']").val());
+        if (parseFloat(km) === prevkm) {
+          isValid = 0;
+        }
+        console.log("isValid: " + isValid + " prevkm: " + prevkm);
+      });
+    }
+    if (nextsibs.length != 0) {
+      nextsibs.each(function() {
+        var nextkm = parseFloat($(this).find("input[name='km']").val());
+        if (parseFloat(km) === nextkm) {
+          isValid = 0;
+        }
+        console.log("isValid: " + isValid + " nextkm: " + nextkm);
+      });
+    }
+
+    if (isValid === 1) {
+      if (!(isNaN(km))) {
+        if (km < (maxkm * 1.05)) {
+          $.getJSON(TIME_CALC_URL, { km: km, maxkm: maxkm, date_time: date_time }, 
+          // response handler
+            function(data) {
+              var times = data.result;
+              console.log("Got a response: " +  times);
+              console.log("Response.open = " + times.open);
+              open_time_field.val( moment(times.open).format("YYYY M/D H:mm"));
+              close_time_field.val( moment(times.close).format("YYYY M/D H:mm"));
+            } // end of handler function
+          );// End of getJSON
+          target.html("&nbsp;")
+        } else {
+          //set notes here!! Do not forgettttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+          target.html("The distance is further than Brevet distance!")
+          control.find("input[name='miles']").val("");
+          control.find("input[name='km']").val("");
+        }
+      } else {
+        target.html("Input is not a number!")
+        control.find("input[name='miles']").val("");
+        control.find("input[name='km']").val("");
+      }
+    } else if (isValid === 0) {
+      target.html("Cannot have duplicate distance!")
+      control.find("input[name='miles']").val("");
+      control.find("input[name='km']").val("");
+    } else {
+      target.html("Previous input box is empty!")
+      control.find("input[name='miles']").val("");
+      control.find("input[name='km']").val("");
+    }
+  }
 
   $(document).ready(function(){
    // Do the following when the page is finished loading
@@ -182,51 +235,13 @@
 
      });   // end of what we do on document ready
 
-      $('#submit').click(
-                        function(e){
-                            e.preventDefault();
-                            // Collect all the non-empty fields and then sent it to /submit
-                            var table = {};
-                            // Count the rows
-                            var r_count = 0;
-                            $('.control').each(
-                                function(index, obj){
-                                    var km = $(obj).find("input[name='km']").val()
-                                    // Avoid empty value
-                                    if (km != ""){
-                                       var row = {};
-                                       row.brevet = $('#brevet_dist_km').val();
-                                       row.begin = $('#begin_date').val();
-                                       row.km = km;
-                                       row.open = $(obj).find("input[name='open']").val();
-                                       row.close = $(obj).find("input[name='close']").val();
-                                       table[index] = row;
-                                       r_count = r_count + 1;
-                                    }
-                                }
-                            );
-                            // Case: When nothing was typed in on either miles or km
-                            if (r_count == 0) {
-                               alert("Need to fill in at least one row!");
-                            }
-                            else {
-                               $.post("/submit", {table: JSON.stringify(table)}, function(response){
-                                  console.log("response: ", response.output);
-                               }, "json");
-                               alert("It is successfully submitted, not click the 'display' button for viewing the result.");
-                               $(".control_time_table tr td input").val("");
-                               $('#brevet_dist_km').val("");
-                               $('#begin_date').val("");
-                            }
-                        }
-                    );
-      $("#display").on("click", function(e) {
-        e.preventDefault();
-        // redirect the page to display
-        window.location.replace("/display");
-        
-      });
-    </script>
+  $("#display").on("click", function() {
+    window.open(
+      '/display',
+      '_blank'
+    )
+  });
+</script>
 
-    </div>
-    </body> </html>
+</div>
+</body> </html>
