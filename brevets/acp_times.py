@@ -33,20 +33,21 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
        An ISO 8601 format date string indicating the control open time.
        This will be in the same time zone as the brevet start time.
     """
-    if control_dist_km >= brevet_dist_km:
-        control_dist_km = brevet_dist_km
     start_time = arrow.get(brevet_start_time)
     elapsed_hours = 0
-    distance_left = control_dist_km
+    dist_left = control_dist_km
+    if dist_left > max_dist:
+        app.logger.debug("This case should not happen!")
+        return -1
     for from_dist, to_dist, speed in max_speed:
         seg_length = to_dist - from_dist
-        if distance_left > seg_length:
+        if dist_left > seg_length:
             elapsed_hours += seg_length / speed
-            distance_left -= seg_length
+            dist_left -= seg_length
         else:
-            elapsed_hours += distance_left / speed
-            open_time = start_time.shift(minutes=round(elapsed_hours*60))
-            return open_time
+            elapsed_hours += dist_left / speed
+            open_time = start_time.shift(hours=elapsed_hours)
+            return open_time.isoformat()
 
 
 def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
@@ -62,25 +63,21 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
        An ISO 8601 format date string indicating the control close time.
        This will be in the same time zone as the brevet start time.
     """
-    if control_dist_km == 0:
-        return brevet_start_time.shift(hours=1)
     start_time = arrow.get(brevet_start_time)
     if control_dist_km >= brevet_dist_km:
         duration = final_close[brevet_dist_km]
         finish_time = start_time.shift(hours=duration)
-        return finish_time
+        return finish_time.isoformat()
     elapsed_hours = 0
-    distance_left = control_dist_km
+    dist_left = control_dist_km
     for from_dist, to_dist, speed in min_speed:
         seg_length = to_dist - from_dist
-        if distance_left > seg_length:
+        if dist_left > seg_length:
             elapsed_hours += seg_length / speed
-            distance_left -= seg_length
+            dist_left -= seg_length
         else:
-            elapsed_hours += distance_left / speed
-            if control_dist_km < 60:
-                elapsed_hours += (60 - control_dist_km) / 60
-            cut_time = start_time.shift(minutes=round(elapsed_hours*60))
-            return cut_time
+            elapsed_hours += dist_left / speed
+            cut_time = start_time.shift(hours=elapsed_hours)
+            return cut_time.isoformat()
 
-    return arrow.now()
+    return arrow.now().isoformat()
