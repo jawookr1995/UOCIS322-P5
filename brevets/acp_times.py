@@ -35,17 +35,14 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
     """
     start_time = arrow.get(brevet_start_time)
     elapsed_hours = 0
-    dist_left = control_dist_km
-    if dist_left > max_dist:
-        app.logger.debug("This case should not happen!")
-        return -1
+    distance_left = control_dist_km
     for from_dist, to_dist, speed in max_speed:
         seg_length = to_dist - from_dist
-        if dist_left > seg_length:
+        if distance_left > seg_length:
             elapsed_hours += seg_length / speed
-            dist_left -= seg_length
+            distance_left -= seg_length
         else:
-            elapsed_hours += dist_left / speed
+            elapsed_hours += distance_left / speed
             open_time = start_time.shift(hours=elapsed_hours)
             return open_time.isoformat()
 
@@ -69,14 +66,14 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
         finish_time = start_time.shift(hours=duration)
         return finish_time.isoformat()
     elapsed_hours = 0
-    dist_left = control_dist_km
+    distance_left = control_dist_km
     for from_dist, to_dist, speed in min_speed:
         seg_length = to_dist - from_dist
-        if dist_left > seg_length:
+        if distance_left > seg_length:
             elapsed_hours += seg_length / speed
-            dist_left -= seg_length
+            distance_left -= seg_length
         else:
-            elapsed_hours += dist_left / speed
+            elapsed_hours += distance_left / speed
             cut_time = start_time.shift(hours=elapsed_hours)
             return cut_time.isoformat()
 
