@@ -6,9 +6,11 @@ services:
                 build: .
                 command: python -u flask_brevets.py
                 ports:
-                        - "6333:5000"
+                        - "6661:5000"
                 depends_on:
                         - db
+                volumes:
+                        - .:/index
                 environment:
                         MONGODB_HOSTNAME: db
         db:
