@@ -22,7 +22,7 @@ app = flask.Flask(__name__)
 CONFIG = config.configuration()
 
 
-client = MongoClient(os.environ['MONGO_HOSTNAME'])
+client = MongoClient(os.environ['MONGODB_HOSTNAME'])
 clinet.connect()
 client.mk_db("brevetsdb")
 
