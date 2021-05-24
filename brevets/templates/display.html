@@ -23,6 +23,7 @@
 		    	<div class = "row">
 					<div class = "col-md -12">
 						<table calss ="ACP_table">
+							{% for row in result %}
 							<tr class = "control">
 								{% for key, value in row.items() %}
 									{% if key == 'km' %}
@@ -38,7 +39,8 @@
 								            <td style="width:300px"> Close Time: {{ value }} </td>
 									{% endif %}
 								{% endfor %}
-									</tr>							
+								</tr>
+								{% endfor %}
 							</table>
 						</div>
 					</div>
