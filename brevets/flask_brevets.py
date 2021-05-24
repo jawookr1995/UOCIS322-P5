@@ -20,15 +20,12 @@ from pymongo import MongoClient
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-app.secret_key = CONFIG.SECRET_KEY
 
-client = MongoClient(os.environ['MONGO_HOSTNAME'], 27017)
+
+client = MongoClient(os.environ['MONGO_HOSTNAME'])
 clinet.connect()
 client.mk_db("brevetsdb")
 
-###
-# Pages
-###
 
 
 @app.route("/")
