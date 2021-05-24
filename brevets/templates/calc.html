@@ -52,7 +52,7 @@
 {% endwith %}
 
 <!-- Design on bootstrap grid -->
-<form role="form" action="/submit" method="POST">
+<form role="form">
 <div class="row">
   <div class="col-md-4">
     <label>Distance</label>
@@ -64,11 +64,11 @@
     <option value="1000">1000km</option>
   </select>
   </div> <!-- columns 1--4  -->
-  <div class="col-md-6">
+  <div class="col-md-4">
     <label>Begins at</label>
-    <input type=date name="begin_date" id="begin_date" value="2021-01-01" />
-    <input type=time name="begin_time" id="begin_time" value="00:00"    />
+    <input type="datetime-local" name="begin_date" id="begin_date" value="2021-01-01T00:00" />
   </div> <!-- columns 5-10 -->
+  <div class="col-md-4">
     <button id="submit">Submit</button>
     <button id="display">Display</button>
   </div> <!-- row -->
@@ -118,18 +118,13 @@
 
   var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
   var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
-
-  $("#entry").submit( function(event) {
-  event.preventDefault();
-  });
-
   // Pass calctimes a <td> element containing the data for a control.
   // It extracts the distance and calls the server to get times to
   // fill in open and close times in a human-readable format.
   // (If we want to also keep the ISO-formatted times, we'll need to
   // stash them in hidden fields.) 
   function calc_times(control) {
-    var km = control.find("input[name='km']").val();
+              var km = control.find("input[name='km']").val();
               var brevet_dist = $('#brevet_dist_km').val();
               var begin_date = $('#begin_date').val();
               var open_time_field = control.find("input[name='open']");
@@ -151,7 +146,6 @@
                       close_time_field.val(moment(times.close).format("YYYY-MM-DDTHH:mm"));
                     }
                   ).fail(function(err){
-                    // In case you get an error...
                     console.log("Error!");
                     console.log(err);
                   });
@@ -191,7 +185,7 @@
       $('#submit').click(
                         function(e){
                             e.preventDefault();
-                            // Collect all the non-empty fields and then sent it to /insert
+                            // Collect all the non-empty fields and then sent it to /submit
                             var table = {};
                             // Count the rows
                             var r_count = 0;
@@ -216,10 +210,10 @@
                                alert("Need to fill in at least one row!");
                             }
                             else {
-                               $.post("/insert", {table: JSON.stringify(table)}, function(response){
+                               $.post("/submit", {table: JSON.stringify(table)}, function(response){
                                   console.log("response: ", response.output);
                                }, "json");
-                               alert("It is successfully submitted, not click the 'disply' button for viewing the result.");
+                               alert("It is successfully submitted, not click the 'display' button for viewing the result.");
                                $(".control_time_table tr td input").val("");
                                $('#brevet_dist_km').val("");
                                $('#begin_date').val("");
