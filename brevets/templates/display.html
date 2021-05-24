@@ -1,12 +1,38 @@
-{% if items|length < 1 %}
-    <h2>Database is empty!!!!!</h2>
-{% else %}
-{% for ddt in dist_date_time %}
-    <h2>Distance: {{ ddt.distance }} date: {{ ddt.begin_date }} time: {{ ddt.begin_time }}</h2>
-{% endfor %}
-{% for item in items %}
-    <h3>Brevet: {{ loop.index }}</h3>
-    <p>miles: {{ item.miles }} km: {{ item.km }} location: {{ item.location }}<p>
-    <p>open: {{ item.open }} close: {{ item.close }}</p>
-{% endfor %}
-{% endif %}
+<!doctype html>
+<html lang="en">
+   <head>
+      <title>ACP Controle Times</title>
+      <meta charset="utf-8">
+      <!-- 'viewport' is used by bootstrap to respond to device size -->
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+      <link
+         rel="stylesheet"
+         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+         crossorigin="anonymous">
+   </head>
+   <body>
+   	<div class ="Chart">
+		<h1> Brevet Times Calculator </h1>
+		{% if brevet == "" and begin == "" %}
+		    <p>Database is empty!!!!! Fill the row out!</p>
+		{% else %}
+		    <p>Most recent result of ACP brevets at {{brevet}} km and begin at: {{ begin }}.</p>
+		{% for row in result %}
+			<tr class = "control">
+			{% for key, value in row.items() %}
+				{% if key == 'km' %}
+					<td style = "width : 250px">
+					Control loc is : {{ value }} km </td>
+	    		{% endif %}
+	    		<!-- Open -->
+	    		{% if key == 'open' %}
+		        	<td style="width:300px"> Open Time: {{ value }} </td>
+	        	{% endif %}
+	        	<!-- Close time -->
+	        	{% if key == 'close' %}
+	            	<td style="width:300px"> Close Time: {{ value }} </td>
+		        {% endif %}
+	    	{% endfor %}
+		</tr>

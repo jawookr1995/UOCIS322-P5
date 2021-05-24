@@ -10,6 +10,6 @@ services:
                 depends_on:
                         - db
                 environment:
-                        MONGODB_HOSTNAME: db
+                        MONGO_HOSTNAME: db
         db:
                 image: mongo:latest

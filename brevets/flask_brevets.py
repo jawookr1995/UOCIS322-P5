@@ -9,6 +9,7 @@ from flask import Flask, redirect, url_for, request, render_template
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
 import config
+import dbclass # Class variable for database
 
 import logging
 import os
@@ -21,8 +22,9 @@ app = flask.Flask(__name__)
 CONFIG = config.configuration()
 app.secret_key = CONFIG.SECRET_KEY
 
-client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
-db = client.tododb
+client = MongoClient(os.environ['MONGO_HOSTNAME'], 27017)
+clinet.connect()
+client.mk_db("brevetsdb")
 
 ###
 # Pages
@@ -73,53 +75,27 @@ def _calc_times():
 
 @app.route('/submit', methods=['POST'])
 def new():
-    #
-    db.tododb.delete_many({})
+    data = request.form.to_dict()
+    # Change the data to a list
+    data['table'] = eval(data['table'])
+    table = data['table']
+    # get the most recent submission
+    db_client.delete_all("mostrecent")
 
-    distance = request.form['distance']
-    begin_date = request.form['begin_date']
-    begin_time = request.form['begin_time']
-    miles_list = request.form.getlist('miles')
-    km_list = request.form.getlist('km')
-    loc_list = request.form.getlist('location')
-    open_list = request.form.getlist('open')
-    close_list = request.form.getlist('close')
-    item_doc = {
-        'distance': distance,
-        'begin_date': begin_date,
-        'begin_time': begin_time
-    }
-    db.tododb.insert_one(item_doc)
-    for i in range(len(km_list)):
-        if (km_list[i] != "" and km_list[i] != None):
-            item_doc = {
-                'miles': float(miles_list[i]),
-                'km': float(km_list[i]),
-                'location': loc_list[i],
-                'open': open_list[i],
-                'close': close_list[i]
-            }
-            db.tododb.insert_one(item_doc)
-
-    return redirect(url_for('index'))
+    for i in range(len(table)):
+        row = table[str(i)]
+        db_client.insert_o("mostrecent", row)
+    return flask.jsonify(output=str(data))
 
 @app.route('/display')
 def display():
-    _dist_date_time = db.tododb.find({}, { "distance": 1, "begin_date": 1, "begin_time": 1})
-    dist_date_time = []
-    i = 0
-    for ddt in _dist_date_time:
-        if i == 0:
-            dist_date_time.append(ddt)
-        i += 1
-    _items = db.tododb.find({}, { "distance": 0, "begin_date": 0, "begin_time": 0}).sort("km")
-    items = []
-    i = 0
-    for item in _items:
-        if i > 0:
-            items.append(item)
-        i += 1
-    return render_template('display.html', dist_date_time=dist_date_time, items=items)
+    everything = db_client.list_all("mostrecent")
+    app.logger.debug(everything)
+    brevet = begin_date = ""
+    if len(everything) > 0:
+        brevet = everything[0]['brevet']
+        begin_date = everything[0]['begin']
+    return flask.render_template('display.html', result=everything, brevet=brevet, begin=begin_date)
 
 
 #############
