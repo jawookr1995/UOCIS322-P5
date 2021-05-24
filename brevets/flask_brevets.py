@@ -19,6 +19,7 @@ from pymongo import MongoClient
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
+app.secret_key = CONFIG.SECRET_KEY
 
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
@@ -38,6 +39,7 @@ def index():
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
+    flask.session['linkback'] = flask.url_for("index")
     return flask.render_template('404.html'), 404
 
 

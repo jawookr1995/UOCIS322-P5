@@ -4,8 +4,16 @@ for ACP-sanctioned brevets
 following rules described at https://rusa.org/octime_alg.html
 and https://rusa.org/pages/rulesForRiders
 """
-import sys
 import arrow
+
+#  Note for CIS 322:
+#  You MUST provide the following two functions
+#  with these signatures, so that I can write
+#  automated tests for grading.  You must keep
+#  these signatures even if you don't use all the
+#  same arguments.  Arguments are explained in the
+#  javadoc comments.
+#
 
 
 # Minimum times as [(from_dist, to_dist, speed),

@@ -80,12 +80,12 @@
   <div class="col-md-12"> 
   <table class="control_time_table">
       <tr>
-  <th> Miles </th>
-  <th> Km </th>
-  <th>Location</th>
-  <th>Open</th>
-  <th>Close</th>
-  <th>Notes</th>
+	<th> Miles </th>
+	<th> Km </th>
+	<th>Location</th>
+	<th>Open</th>
+	<th>Close</th>
+	<th>Notes</th>
       </tr>
    {% for row in range(20) %}
     <tr class="control">
@@ -94,11 +94,11 @@
            min="0" max="900" step="any" size="5" /></td>
       <!-- Dist (km) -->
       <td><input name="km" type="text"
-     min="0" max="1100" size="5" /> </td>
+	   min="0" max="1100" size="5" /> </td>
       <!-- Location (optional) -->
       <td><input name="location" type="text" 
         placeholder="Optional location name"
-  size="20" /> </td>
+	size="20" /> </td>
       <!-- Open time (read only, set by JavaScript function -->
       <td><input name="open" type="datetime" value="" readonly /></td>
       <!-- Close time (read only, set by JavaScript function -->
