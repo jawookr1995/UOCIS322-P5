@@ -66,9 +66,11 @@
   </div> <!-- columns 1--4  -->
   <div class="col-md-6">
     <label>Begins at</label>
-    <input type=date name="begin_date" id="begin_date" value="2017-01-01" />
+    <input type=date name="begin_date" id="begin_date" value="2021-01-01" />
     <input type=time name="begin_time" id="begin_time" value="00:00"    />
   </div> <!-- columns 5-10 -->
+    <button id="submit">Submit</button>
+    <button id="display">Display</button>
   </div> <!-- row -->
 
   <br />  <!-- Cosmetic -- a little vertical space -->
@@ -90,10 +92,10 @@
    {% for row in range(20) %}
     <tr class="control">
       <!-- Dist (mi) -->
-      <td><input name="miles" type="number" 
+      <td><input name="miles" type="number" step ="0.00001" 
            min="0" max="900" step="any" size="5" /></td>
       <!-- Dist (km) -->
-      <td><input name="km" type="text"
+      <td><input name="km" type="text" step = "0.00001"
 	   min="0" max="1100" size="5" /> </td>
       <!-- Location (optional) -->
       <td><input name="location" type="text" 
@@ -104,16 +106,13 @@
       <!-- Close time (read only, set by JavaScript function -->
       <td><input name="close" type="datetime" value="" readonly /></td>
       <!-- Notes (error messages for this row) -->
-      <td class="notes"><p class="n"></p></td>
+      <td class="notes"> &nbsp; </td>
     </tr>
     {% endfor %}
   </table>
   </div> <!-- col -->
   </div> <!-- row -->
-  <input type="submit"></input>
 </form>
-
-<button id="display">Display</button>
 
 <script type="text/javascript">
 
