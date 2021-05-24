@@ -20,6 +20,7 @@ from pymongo import MongoClient
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
+app.secret_key = CONFIG.SECRET_KEY
 
 
 client = dbclass.Mongo(os.environ['MONGODB_HOSTNAME'])
