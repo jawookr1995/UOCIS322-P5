@@ -20,12 +20,11 @@ from pymongo import MongoClient
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-app.secret_key = CONFIG.SECRET_KEY
 
 
-client = dbclass.Mongo(os.environ['MONGODB_HOSTNAME'])
-client.connect()
-client.mk_db("brevetsdb")
+d_client = dbclass.Mongo(os.environ['MONGODB_HOSTNAME'])
+d_client.connect()
+d_client.mk_db("brevetsdb")
 
 
 
@@ -78,22 +77,22 @@ def new():
     data['table'] = eval(data['table'])
     table = data['table']
     # get the most recent submission
-    client.delete_all("mostrecent")
+    d_client.delete_all("mostrecent")
 
     for i in range(len(table)):
         row = table[str(i)]
-        client.insert_o("mostrecent", row)
+        d_client.insert_o("mostrecent", row)
     return flask.jsonify(output=str(data))
 
 @app.route('/display')
 def display():
-    everything = client.list_all("mostrecent")
-    app.logger.debug(everything)
+    retrieve = d_client.list_all("mostrecent")
+    app.logger.debug(retrieve)
     brevet = begin_date = ""
-    if len(everything) > 0:
-        brevet = everything[0]['brevet']
-        begin_date = everything[0]['begin']
-    return flask.render_template('display.html', result=everything, brevet=brevet, begin=begin_date)
+    if len(retrieve) > 0:
+        brevet = retrieve[0]['brevet']
+        begin_date = retrieve[0]['begin']
+    return flask.render_template('display.html', result=retrieve, brevet=brevet, begin=begin_date)
 
 
 #############

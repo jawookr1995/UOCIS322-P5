@@ -69,7 +69,7 @@
     <input type=date name="begin_date" id="begin_date" value="2021-01-01" />
     <input type=time name="begin_time" id="begin_time" value="00:00"    />
   </div> <!-- columns 5-10 -->
-    <button id="submit">Submit</button>
+    <button id="new">Submit</button>
     <button id="display">Display</button>
   </div> <!-- row -->
 
@@ -178,8 +178,8 @@
               var times = data.result;
               console.log("Got a response: " +  times);
               console.log("Response.open = " + times.open);
-              open_time_field.val( moment(times.open).format("ddd M/D H:mm"));
-              close_time_field.val( moment(times.close).format("ddd M/D H:mm"));
+              open_time_field.val( moment(times.open).format("YYYY M/D H:mm"));
+              close_time_field.val( moment(times.close).format("YYYY M/D H:mm"));
             } // end of handler function
           );// End of getJSON
           target.html("&nbsp;")

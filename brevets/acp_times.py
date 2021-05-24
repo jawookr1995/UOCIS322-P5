@@ -4,16 +4,8 @@ for ACP-sanctioned brevets
 following rules described at https://rusa.org/octime_alg.html
 and https://rusa.org/pages/rulesForRiders
 """
+import sys
 import arrow
-
-#  Note for CIS 322:
-#  You MUST provide the following two functions
-#  with these signatures, so that I can write
-#  automated tests for grading.  You must keep
-#  these signatures even if you don't use all the
-#  same arguments.  Arguments are explained in the
-#  javadoc comments.
-#
 
 
 # Minimum times as [(from_dist, to_dist, speed),
@@ -21,7 +13,7 @@ import arrow
 min_speed = [(0, 200, 15), (200, 400, 15), (400, 600, 15),
              (600, 1000, 11.428), (1000, 1300, 13.333)]
 max_speed = [(0, 200, 34), (200, 400, 32), (400, 600, 30),
-             (600, 1000, 28), (1000, 1300, 28)]
+             (600, 1000, 28), (1000, 1300, 26)]
 
 # Final control times (at or exceeding brevet distance) are special cases
 final_close = {200: 13.5, 300: 20, 400: 27, 600: 40, 1000: 75}
@@ -41,6 +33,8 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
        An ISO 8601 format date string indicating the control open time.
        This will be in the same time zone as the brevet start time.
     """
+    if control_dist_km >= brevet_dist_km:
+        control_dist_km = brevet_dist_km
     start_time = arrow.get(brevet_start_time)
     elapsed_hours = 0
     distance_left = control_dist_km
@@ -51,8 +45,8 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
             distance_left -= seg_length
         else:
             elapsed_hours += distance_left / speed
-            open_time = start_time.shift(hours=elapsed_hours)
-            return open_time.isoformat()
+            open_time = start_time.shift(minutes=round(elapsed_hours*60))
+            return open_time
 
 
 def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
@@ -68,11 +62,13 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
        An ISO 8601 format date string indicating the control close time.
        This will be in the same time zone as the brevet start time.
     """
+    if control_dist_km == 0:
+        return brevet_start_time.shift(hours=1)
     start_time = arrow.get(brevet_start_time)
     if control_dist_km >= brevet_dist_km:
         duration = final_close[brevet_dist_km]
         finish_time = start_time.shift(hours=duration)
-        return finish_time.isoformat()
+        return finish_time
     elapsed_hours = 0
     distance_left = control_dist_km
     for from_dist, to_dist, speed in min_speed:
@@ -82,7 +78,9 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
             distance_left -= seg_length
         else:
             elapsed_hours += distance_left / speed
-            cut_time = start_time.shift(hours=elapsed_hours)
-            return cut_time.isoformat()
+            if control_dist_km < 60:
+                elapsed_hours += (60 - control_dist_km) / 60
+            cut_time = start_time.shift(minutes=round(elapsed_hours*60))
+            return cut_time
 
-    return arrow.now().isoformat()
+    return arrow.now()
