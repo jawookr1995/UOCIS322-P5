@@ -234,13 +234,51 @@
 
      });   // end of what we do on document ready
 
-  $("#display").on("click", function() {
-    window.open(
-      '/display',
-      '_blank'
-    )
-  });
-</script>
+      $('#submit').click(
+                        function(e){
+                            e.preventDefault();
+                            // Collect all the non-empty fields and then sent it to /insert
+                            var table = {};
+                            // Count the rows
+                            var r_count = 0;
+                            $('.control').each(
+                                function(index, obj){
+                                    var km = $(obj).find("input[name='km']").val()
+                                    // Avoid empty value
+                                    if (km != ""){
+                                       var row = {};
+                                       row.brevet = $('#brevet_dist_km').val();
+                                       row.begin = $('#begin_date').val();
+                                       row.km = km;
+                                       row.open = $(obj).find("input[name='open']").val();
+                                       row.close = $(obj).find("input[name='close']").val();
+                                       table[index] = row;
+                                       r_count = r_count + 1;
+                                    }
+                                }
+                            );
+                            // Case: When nothing was typed in on either miles or km
+                            if (r_count == 0) {
+                               alert("Need to fill in at least one row!");
+                            }
+                            else {
+                               $.post("/insert", {table: JSON.stringify(table)}, function(response){
+                                  console.log("response: ", response.output);
+                               }, "json");
+                               alert("It is successfully submitted, not click the 'disply' button for viewing the result.");
+                               $(".control_time_table tr td input").val("");
+                               $('#brevet_dist_km').val("");
+                               $('#begin_date').val("");
+                            }
+                        }
+                    );
+      $("#display").on("click", function(e) {
+        e.preventDefault();
+        // redirect the page to display
+        window.location.replace("/display");
+        
+      });
+    </script>
 
-</div>
-</body> </html>
+    </div>
+    </body> </html>
