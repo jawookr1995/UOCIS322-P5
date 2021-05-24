@@ -23,7 +23,7 @@ CONFIG = config.configuration()
 
 
 client = MongoClient(os.environ['MONGODB_HOSTNAME'])
-clinet.connect()
+client.connect()
 client.mk_db("brevetsdb")
 
 
