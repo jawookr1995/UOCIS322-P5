@@ -27,9 +27,9 @@ def test_200km():
 
     
     # When controle distacne and brevet distance are same
-    assert open_time(200, 200, arrow.get("2021-05-23T10:15")) == arrow.get("2021-05-23T16:08")
-    assert close_time(200, 200, arrow.get("2021-05-23T10:15")) == arrow.get("2021-05-23T23:45")
+    assert open_time(200, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-23T18:22")
+    assert close_time(200, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-24T02:00")
 
     # control distance is larger than brevet distance, but not exceeding 20% longer.
-    assert open_time(205, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-23T18:23")
-    assert close_time(205, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-25T02:00")
+    assert open_time(205, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-23T18:32")
+    assert close_time(205, 200, arrow.get("2021-05-23T12:30")) == arrow.get("2021-05-24T02:00")
