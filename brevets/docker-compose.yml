@@ -1,11 +1,15 @@
-web:
-  build: .
-  command: python -u flask_mongo_brevets.py
-  ports:
-    - "5000:5000"
-  volumes:
-    - .:/index
-  links:
-    - db
-db:
-  image: mongo
+version: '3'
+
+services:
+
+        web:
+                build: .
+                command: python -u flask_brevets.py
+                ports:
+                        - "5003:5000"
+                depends_on:
+                        - db
+                environment:
+                        MONGODB_HOSTNAME: db
+        db:
+                image: mongo:latest
