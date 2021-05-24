@@ -72,7 +72,7 @@ def _calc_times():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    db.tododb.delete_many({})
+    client.tododb.delete_many({})
 
     distance = request.form['distance']
     begin_date = request.form['begin_date']

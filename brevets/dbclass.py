@@ -10,7 +10,7 @@ class Mongo:
         self.db = None
 
     def mk_db(self, dataB):
-        self.db = self.client.tododb
+        self.db = self.client[dataB]
 
     def connect(self):
         self.client = MongoClient('mongodb://' + self.tester, 27017)
@@ -25,4 +25,4 @@ class Mongo:
 
     def list_all(self, collection):
         return list(self.db[collection].find())
-        # return all the list that is contained in db collection
+        # return all the list that is contained in db
