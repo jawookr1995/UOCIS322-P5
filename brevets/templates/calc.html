@@ -130,80 +130,34 @@
   // stash them in hidden fields.) 
   function calc_times(control) {
     var km = control.find("input[name='km']").val();
-    var open_time_field = control.find("input[name='open']");
-    var close_time_field = control.find("input[name='close']");
-    var sel = document.getElementById('brevet_dist_km');
-    var opt = sel.options[sel.selectedIndex];
-    var maxkm = opt.value;
-    console.log("maxkm: " + maxkm);
-    var dateControl = document.querySelector('input[type="date"]');
-    var timeControl = document.querySelector('input[type="time"]');
-    var date_time = dateControl.value + " " + timeControl.value + ":00";
-    date_time = moment(date_time, moment.ISO_8601).format();
-    console.log("date_time: " + date_time);
-    var target = control.find("p.n")
-    var isValid = 1;
-    var prevsib = control.prev();
-    var prevsibs = control.prevAll();
-    var nextsibs = control.nextAll();
+              var brevet_dist = $('#brevet_dist_km').val();
+              var begin_date = $('#begin_date').val();
+              var open_time_field = control.find("input[name='open']");
+              var close_time_field = control.find("input[name='close']");
 
-    if (prevsib != null && prevsib.find("input[name='km']").val() === "") {
-      isValid = 2;
-    }
-    if (prevsibs.length != 0) {
-      prevsibs.each(function() {
-        var prevkm = parseFloat($(this).find("input[name='km']").val());
-        if (parseFloat(km) === prevkm) {
-          isValid = 0;
-        }
-        console.log("isValid: " + isValid + " prevkm: " + prevkm);
-      });
-    }
-    if (nextsibs.length != 0) {
-      nextsibs.each(function() {
-        var nextkm = parseFloat($(this).find("input[name='km']").val());
-        if (parseFloat(km) === nextkm) {
-          isValid = 0;
-        }
-        console.log("isValid: " + isValid + " nextkm: " + nextkm);
-      });
-    }
-
-    if (isValid === 1) {
-      if (!(isNaN(km))) {
-        if (km < (maxkm * 1.05)) {
-          $.getJSON(TIME_CALC_URL, { km: km, maxkm: maxkm, date_time: date_time }, 
-          // response handler
-            function(data) {
-              var times = data.result;
-              console.log("Got a response: " +  times);
-              console.log("Response.open = " + times.open);
-              open_time_field.val( moment(times.open).format("YYYY M/D H:mm"));
-              close_time_field.val( moment(times.close).format("YYYY M/D H:mm"));
-            } // end of handler function
-          );// End of getJSON
-          target.html("&nbsp;")
-        } else {
-          //set notes here!! Do not forgettttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
-          target.html("The distance is further than Brevet distance!")
-          control.find("input[name='miles']").val("");
-          control.find("input[name='km']").val("");
-        }
-      } else {
-        target.html("Input is not a number!")
-        control.find("input[name='miles']").val("");
-        control.find("input[name='km']").val("");
-      }
-    } else if (isValid === 0) {
-      target.html("Cannot have duplicate distance!")
-      control.find("input[name='miles']").val("");
-      control.find("input[name='km']").val("");
-    } else {
-      target.html("Previous input box is empty!")
-      control.find("input[name='miles']").val("");
-      control.find("input[name='km']").val("");
-    }
-  }
+              if (km > (brevet_dist * 1.2)) {
+                 console.log("The control point (" + km + " km) is over 20% longer than the theoretical distance (" + brevet_dist + " km). Give valid control location!");
+                 alert("The control point (" + km + " km) is over 20% longer than the theoretical distance (" + brevet_dist + " km). Give valid control distance!");
+                 control.html("");
+              }
+              else {
+                 $.getJSON(TIME_CALC_URL, {km: km, brevet_dist: brevet_dist, begin_date: begin_date}).done(
+                   function(data) {
+                      var times = data.result;
+                      console.log("Got a response: ");
+                      console.log("Response.open = " + times.open);
+                      // This will fill up the open time and close time with format.
+                      open_time_field.val(moment(times.open).format("YYYY-MM-DDTHH:mm"));
+                      close_time_field.val(moment(times.close).format("YYYY-MM-DDTHH:mm"));
+                    }
+                  ).fail(function(err){
+                    // In case you get an error...
+                    console.log("Error!");
+                    console.log(err);
+                  });
+              }
+            }
+    
 
   $(document).ready(function(){
    // Do the following when the page is finished loading
