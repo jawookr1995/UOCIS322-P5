@@ -1,6 +1,6 @@
 web:
   build: .
-  command: python -u flask_mongo_brevets.py
+  command: python -u flask_brevets.py
   ports:
     - "5553:5000"
   volumes:
