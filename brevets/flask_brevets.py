@@ -77,16 +77,16 @@ def new():
     data['table'] = eval(data['table'])
     table = data['table']
     # get the most recent submission
-    db_client.delete_all("mostrecent")
+    client.delete_all("mostrecent")
 
     for i in range(len(table)):
         row = table[str(i)]
-        db_client.insert_o("mostrecent", row)
+        client.insert_o("mostrecent", row)
     return flask.jsonify(output=str(data))
 
 @app.route('/display')
 def display():
-    everything = db_client.list_all("mostrecent")
+    everything = client.list_all("mostrecent")
     app.logger.debug(everything)
     brevet = begin_date = ""
     if len(everything) > 0:
