@@ -9,8 +9,6 @@ services:
                         - "6661:5000"
                 depends_on:
                         - db
-                volumes:
-                        - .:/index
                 environment:
                         MONGODB_HOSTNAME: db
         db:
