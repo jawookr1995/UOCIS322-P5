@@ -10,7 +10,7 @@ class Mongo:
         self.db = None
 
     def connect(self):
-        self.client = MongoClient('mongodb://' + self.client_name, 27017)
+        self.client = MongoClient('mongodb://' + self.tester, 27017)
         # Default mongoDB Port
 
     def mk_db(self, dataB):
