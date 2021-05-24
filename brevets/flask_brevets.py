@@ -9,7 +9,6 @@ from flask import Flask, redirect, url_for, request, render_template
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
 import config
-import dbclass # Class variable for database
 
 import logging
 import os
@@ -21,12 +20,12 @@ from pymongo import MongoClient
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
 
+client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
+db = client.tododb
 
-client = dbclass.Mongo(os.environ['MONGODB_HOSTNAME'])
-client.connect()
-client.mk_db("db_for_brev")
-
-
+###
+# Pages
+###
 
 
 @app.route("/")
@@ -71,8 +70,9 @@ def _calc_times():
     return flask.jsonify(result=result)
 
 @app.route('/submit', methods=['POST'])
-def submit():
-    client.tododb.delete_many({})
+def new():
+    #
+    db.tododb.delete_many({})
 
     distance = request.form['distance']
     begin_date = request.form['begin_date']
