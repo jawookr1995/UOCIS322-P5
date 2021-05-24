@@ -2,7 +2,7 @@ web:
   build: .
   command: python -u flask_mongo_brevets.py
   ports:
-    - "5000:5000"
+    - "5553:5000"
   volumes:
     - .:/index
   links:
