@@ -71,27 +71,52 @@ def _calc_times():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    data = request.form.to_dict()
-    # Change the data to a list
-    data['table'] = eval(data['table'])
-    table = data['table']
-    # get the most recent submission
-    d_client.delete_all("mostrecent")
+    db.tododb.delete_many({})
 
-    for i in range(len(table)):
-        row = table[str(i)]
-        d_client.insert_o("mostrecent", row)
-    return flask.jsonify(output=str(data))
+    distance = request.form['distance']
+    begin_date = request.form['begin_date']
+    begin_time = request.form['begin_time']
+    miles_list = request.form.getlist('miles')
+    km_list = request.form.getlist('km')
+    loc_list = request.form.getlist('location')
+    open_list = request.form.getlist('open')
+    close_list = request.form.getlist('close')
+    item_doc = {
+        'distance': distance,
+        'begin_date': begin_date,
+        'begin_time': begin_time
+    }
+    db.tododb.insert_one(item_doc)
+    for i in range(len(km_list)):
+        if (km_list[i] != "" and km_list[i] != None):
+            item_doc = {
+                'miles': float(miles_list[i]),
+                'km': float(km_list[i]),
+                'location': loc_list[i],
+                'open': open_list[i],
+                'close': close_list[i]
+            }
+            db.tododb.insert_one(item_doc)
+
+    return redirect(url_for('index'))
 
 @app.route('/display')
 def display():
-    retrieve = d_client.list_all("mostrecent")
-    app.logger.debug(retrieve)
-    brevet = begin_date = ""
-    if len(retrieve) > 0:
-        brevet = retrieve[0]['brevet']
-        begin_date = retrieve[0]['begin']
-    return flask.render_template('display.html', result=retrieve, brevet=brevet, begin=begin_date)
+    _dist_date_time = db.tododb.find({}, { "distance": 1, "begin_date": 1, "begin_time": 1})
+    dist_date_time = []
+    i = 0
+    for ddt in _dist_date_time:
+        if i == 0:
+            dist_date_time.append(ddt)
+        i += 1
+    _items = db.tododb.find({}, { "distance": 0, "begin_date": 0, "begin_time": 0}).sort("km")
+    items = []
+    i = 0
+    for item in _items:
+        if i > 0:
+            items.append(item)
+        i += 1
+    return render_template('display.html', dist_date_time=dist_date_time, items=items)
 
 
 #############
