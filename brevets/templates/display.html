@@ -20,20 +20,28 @@
 		{% else %}
 		    <p>Most recent result of ACP brevets at {{brevet}} km and begin at: {{ begin }}.</p>
 			{% for row in result %}
-				<tr class = "control">
-				{% for key, value in row.items() %}
-					{% if key == 'km' %}
-						<td style = "width : 250px">
-						Control loc is : {{ value }} km </td>
-		    		{% endif %}
-		    		<!-- Open -->
-		    		{% if key == 'open' %}
-			        	<td style="width:300px"> Open Time: {{ value }} </td>
-		        	{% endif %}
-		        	<!-- Close time -->
-		        	{% if key == 'close' %}
-		            	<td style="width:300px"> Close Time: {{ value }} </td>
-			        {% endif %}
-		    	{% endfor %}
-		    {% endif %}
-			</tr>
+				<div class = "col-md -12">
+					<table calss ="ACP_table">
+						<tr class = "control">
+						{% for key, value in row.items() %}
+							{% if key == 'km' %}
+								<td style = "width : 250px">
+								Control loc is : {{ value }} km </td>
+				    		{% endif %}
+				    		<!-- Open -->
+				    		{% if key == 'open' %}
+					        	<td style="width:300px"> Open Time: {{ value }} </td>
+				        	{% endif %}
+				        	<!-- Close time -->
+				        	{% if key == 'close' %}
+				            	<td style="width:300px"> Close Time: {{ value }} </td>
+					        {% endif %}
+				    	{% endfor %}
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+		{% endif %}
+		</div>
+	</body>
+	</html>
