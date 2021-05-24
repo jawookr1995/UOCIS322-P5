@@ -71,7 +71,7 @@ def _calc_times():
     return flask.jsonify(result=result)
 
 @app.route('/submit', methods=['POST'])
-def new():
+def submit():
     data = request.form.to_dict()
     # Change the data to a list
     data['table'] = eval(data['table'])
