@@ -1,5 +1,5 @@
 FROM python:3.8.5
-MAINTAINER Perat Damrongsiri "peratd@uoregon.edu"
+MAINTAINER Theodore Yun "jawookr1995@gmail.com"
 RUN apt-get update -y
 RUN apt-get install -y python-pip python-dev build-essential
 COPY . /app
