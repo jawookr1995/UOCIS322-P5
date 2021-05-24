@@ -38,7 +38,6 @@ def index():
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
-    flask.session['linkback'] = flask.url_for("index")
     return flask.render_template('404.html'), 404
 
 
