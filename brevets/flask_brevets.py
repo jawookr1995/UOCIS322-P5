@@ -19,7 +19,7 @@ from pymongo import MongoClient
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-app.secret_key = CONFIG.SECRET_KEY
+
 
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
@@ -39,7 +39,6 @@ def index():
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
-    flask.session['linkback'] = flask.url_for("index")
     return flask.render_template('404.html'), 404
 
 
@@ -78,7 +77,6 @@ def new():
 
     distance = request.form['distance']
     begin_date = request.form['begin_date']
-    begin_time = request.form['begin_time']
     miles_list = request.form.getlist('miles')
     km_list = request.form.getlist('km')
     loc_list = request.form.getlist('location')
@@ -87,7 +85,6 @@ def new():
     item_doc = {
         'distance': distance,
         'begin_date': begin_date,
-        'begin_time': begin_time
     }
     db.tododb.insert_one(item_doc)
     for i in range(len(km_list)):
